@@ -40,7 +40,7 @@ public class ServerConfig
     private NodePoolType poolType = DEFAULT;
     private Duration clusterStatsExpirationDuration = new Duration(0, MILLISECONDS);
     private boolean nestedDataSerializationEnabled = true;
-    private boolean isErrorI18nEnabled = false;
+    private boolean isErrorI18nEnabled;
 
     public boolean isResourceManager()
     {
