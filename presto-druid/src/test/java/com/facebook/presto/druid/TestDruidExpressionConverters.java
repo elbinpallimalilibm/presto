@@ -16,10 +16,8 @@ package com.facebook.presto.druid;
 import com.facebook.presto.spi.PrestoException;
 import com.facebook.presto.spi.relation.RowExpression;
 import com.facebook.presto.spi.relation.VariableReferenceExpression;
-import com.facebook.presto.util.Failures;
 import org.testng.annotations.Test;
 
-import java.util.Locale;
 import java.util.function.Function;
 
 import static com.facebook.presto.druid.DruidErrorCode.DRUID_PUSHDOWN_UNSUPPORTED_EXPRESSION;
@@ -101,7 +99,6 @@ public class TestDruidExpressionConverters
             fail("expected to not reach here: Generated " + actualDruidExpression);
         }
         catch (PrestoException e) {
-            e = (PrestoException) Failures.toLocalisedPrestoException(e, Locale.US);
             assertEquals(e.getErrorCode(), DRUID_PUSHDOWN_UNSUPPORTED_EXPRESSION.toErrorCode());
         }
     }
