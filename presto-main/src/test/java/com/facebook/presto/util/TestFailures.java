@@ -88,5 +88,35 @@ public class TestFailures
         assertEquals(localisedPrestoError.getErrorCodeSupplier(), SYNTAX_ERROR);
         assertEquals(localisedPrestoError.getErrorCode(), SYNTAX_ERROR.toErrorCode());
         assertEquals(localisedPrestoError.getMessage(), "Too many dots in table name: fake_table");
+        assertEquals(localisedPrestoError.getCause(), syntaxError);
+    }
+
+    @Test
+    public void testToFailureWithLocalisedPrestoException()
+    {
+        Throwable syntaxError = new PrestoException("SYNTAX_ERROR_2", SYNTAX_ERROR, "fake_table");
+        Throwable localisedError = Failures.toLocalisedPrestoException(syntaxError, Locale.US);
+
+        ExecutionFailureInfo failureInfo = toFailure(localisedError);
+        assertEquals(failureInfo.getType(), "com.facebook.presto.spi.PrestoException");
+        assertEquals(failureInfo.getMessage(), "Too many dots in table name: fake_table");
+        assertEquals(failureInfo.getCause().getType(), "com.facebook.presto.spi.PrestoException");
+        assertEquals(failureInfo.getCause().getMessage(), "SYNTAX_ERROR");
+    }
+
+    /**
+     * Test toFailure method with a PrestoException that was intended to be localized
+     * but somehow missed the localization call.
+     */
+    @Test
+    public void testToFailureCatchAllScenario()
+    {
+        Throwable syntaxError = new PrestoException("SYNTAX_ERROR_2", SYNTAX_ERROR, "fake_table");
+
+        ExecutionFailureInfo failureInfo = toFailure(syntaxError);
+        assertEquals(failureInfo.getType(), "com.facebook.presto.spi.PrestoException");
+        assertEquals(failureInfo.getMessage(), "Too many dots in table name: fake_table");
+        assertEquals(failureInfo.getCause().getType(), "com.facebook.presto.spi.PrestoException");
+        assertEquals(failureInfo.getCause().getMessage(), "SYNTAX_ERROR");
     }
 }
