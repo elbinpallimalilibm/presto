@@ -17,7 +17,10 @@ import com.facebook.presto.execution.ExecutionFailureInfo;
 import com.facebook.presto.spi.PrestoException;
 import org.testng.annotations.Test;
 
+import java.util.Locale;
+
 import static com.facebook.presto.spi.StandardErrorCode.GENERIC_INTERNAL_ERROR;
+import static com.facebook.presto.spi.StandardErrorCode.SYNTAX_ERROR;
 import static com.facebook.presto.spi.StandardErrorCode.TOO_MANY_REQUESTS_FAILED;
 import static com.facebook.presto.util.Failures.toFailure;
 import static org.testng.Assert.assertEquals;
@@ -71,5 +74,19 @@ public class TestFailures
         assertEquals(failure.getCause().getMessage(), "fake exception 1");
         assertEquals(failure.getSuppressed().size(), 0);
         assertEquals(failure.getErrorCode(), GENERIC_INTERNAL_ERROR.toErrorCode());
+    }
+
+    @Test
+    public void testToLocalisedPrestoException()
+    {
+        Throwable syntaxError = new PrestoException("SYNTAX_ERROR_2", SYNTAX_ERROR, "fake_table");
+        Throwable localisedError = Failures.toLocalisedPrestoException(syntaxError, Locale.US);
+
+        assertEquals(localisedError.getClass(), PrestoException.class);
+
+        PrestoException localisedPrestoError = (PrestoException) localisedError;
+        assertEquals(localisedPrestoError.getErrorCodeSupplier(), SYNTAX_ERROR);
+        assertEquals(localisedPrestoError.getErrorCode(), SYNTAX_ERROR.toErrorCode());
+        assertEquals(localisedPrestoError.getMessage(), "Too many dots in table name: fake_table");
     }
 }
