@@ -107,7 +107,7 @@ public class DeltaTableName
     {
         Matcher match = TABLE_PATTERN.matcher(tableName);
         if (!match.matches()) {
-            throw new PrestoException("NOT_SUPPORTED_26", NOT_SUPPORTED, tableName);
+            throw new PrestoException("NOT_SUPPORTED_NOT_THE_EXPECTED_TABLE_NAME_FORMAT", NOT_SUPPORTED, tableName);
         }
 
         String tableNameOrPath = match.group(TABLE_GROUP_NAME);
