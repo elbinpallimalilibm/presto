@@ -99,7 +99,7 @@ public class DeltaClient
         Metadata metadata = snapshot.getMetadata();
         String format = metadata.getFormat().getProvider();
         if (!PARQUET.name().equalsIgnoreCase(format)) {
-            throw new PrestoException("DELTA_UNSUPPORTED_DATA_FORMAT_1",
+            throw new PrestoException("DELTA_UNSUPPORTED_DATA_FORMAT_HAS_UNSUPPORTED_DATA_FORMAT",
                     DELTA_UNSUPPORTED_DATA_FORMAT, schemaTableName, format);
         }
 
