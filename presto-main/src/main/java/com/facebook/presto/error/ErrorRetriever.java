@@ -32,6 +32,7 @@ public class ErrorRetriever
     private static List<Locale> localesToLoad = Collections.emptyList();
     private static Map<Locale, CombinedResourceBundle> resourceBundles = new HashMap<>();
     private static final Logger log = Logger.get(ErrorRetriever.class);
+    private static final Locale defaultLocale = Locale.US;
 
     private ErrorRetriever() {}
 
@@ -40,9 +41,9 @@ public class ErrorRetriever
         ErrorRetriever.isErrorI18nEnabled = isErrorI18nEnabled;
 
         // Add default resource bundle
-        CombinedResourceBundle defaultResourceBundle = new CombinedResourceBundle(Locale.US);
+        CombinedResourceBundle defaultResourceBundle = new CombinedResourceBundle(defaultLocale);
         resourceBundles.put(Locale.US, defaultResourceBundle);
-        ResourceBundle bundle = ResourceBundle.getBundle("error/Messages", Locale.US);
+        ResourceBundle bundle = ResourceBundle.getBundle("error/Messages", defaultLocale);
         defaultResourceBundle.addToResources(bundle);
 
         if (isErrorI18nEnabled) {
@@ -60,8 +61,8 @@ public class ErrorRetriever
     public static void addErrorMessagesFromPlugin(URLClassLoader pluginClassLoader, String plugin)
     {
         try {
-            ResourceBundle bundle = ResourceBundle.getBundle("error/Messages", Locale.US, pluginClassLoader);
-            resourceBundles.get(Locale.US).addToResources(bundle);
+            ResourceBundle bundle = ResourceBundle.getBundle("error/Messages", defaultLocale, pluginClassLoader);
+            resourceBundles.get(defaultLocale).addToResources(bundle);
         }
         catch (MissingResourceException e) {
             log.debug("No bundle available for error/Messages in plugin %s", plugin);
@@ -86,14 +87,14 @@ public class ErrorRetriever
             requireNonNull(locale, "locale cannot be null");
         }
         else {
-            locale = Locale.US;
+            locale = defaultLocale;
         }
 
         ResourceBundle selectedBundle = resourceBundles.get(locale);
         if (selectedBundle == null) {
             // If we are trying to load a resource we don't have,
             // load the default resource instead.
-            selectedBundle = resourceBundles.get(Locale.US);
+            selectedBundle = resourceBundles.get(defaultLocale);
         }
         return selectedBundle.getString(errorKey);
     }
