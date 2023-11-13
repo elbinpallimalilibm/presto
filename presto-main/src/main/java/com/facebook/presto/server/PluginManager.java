@@ -22,6 +22,7 @@ import com.facebook.presto.common.type.Type;
 import com.facebook.presto.connector.ConnectorManager;
 import com.facebook.presto.cost.HistoryBasedPlanStatisticsManager;
 import com.facebook.presto.dispatcher.QueryPrerequisitesManager;
+import com.facebook.presto.error.ErrorRetriever;
 import com.facebook.presto.eventlistener.EventListenerManager;
 import com.facebook.presto.execution.resourceGroups.ResourceGroupManager;
 import com.facebook.presto.metadata.Metadata;
@@ -208,6 +209,7 @@ public class PluginManager
         try (ThreadContextClassLoader ignored = new ThreadContextClassLoader(pluginClassLoader)) {
             loadPlugin(pluginClassLoader);
         }
+        ErrorRetriever.addResourcesFromPlugin(pluginClassLoader, plugin);
         log.info("-- Finished loading plugin %s --", plugin);
     }
 
