@@ -13,7 +13,6 @@
  */
 package com.facebook.presto.error;
 
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -22,7 +21,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
 
-public class CombinedResourceBundle extends ResourceBundle
+public class CombinedResourceBundle
+        extends ResourceBundle
 {
     private Map<String, String> combinedResources = new HashMap<>();
 
@@ -58,4 +58,3 @@ public class CombinedResourceBundle extends ResourceBundle
         return Collections.enumeration(combinedResources.keySet());
     }
 }
-

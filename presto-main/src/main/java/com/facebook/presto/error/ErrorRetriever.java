@@ -62,7 +62,8 @@ public class ErrorRetriever
         try {
             ResourceBundle bundle = ResourceBundle.getBundle("error/Messages", Locale.US, pluginClassLoader);
             resourceBundles.get(Locale.US).addToResources(bundle);
-        } catch (MissingResourceException e) {
+        }
+        catch (MissingResourceException e) {
             log.debug("No bundle available for error/Messages in plugin %s", plugin);
         }
 
