@@ -39,34 +39,42 @@ public class ErrorRetriever
     {
         ErrorRetriever.isErrorI18nEnabled = isErrorI18nEnabled;
 
-        // Add default resource bundle with null key
-        resourceBundles.put(Locale.US, new CombinedResourceBundle(Locale.US));
+        // Add default resource bundle
+        CombinedResourceBundle defaultResourceBundle = new CombinedResourceBundle(Locale.US);
+        resourceBundles.put(Locale.US, defaultResourceBundle);
+        ResourceBundle bundle = ResourceBundle.getBundle("error/Messages", Locale.US);
+        defaultResourceBundle.addToResources(bundle);
+
         if (isErrorI18nEnabled) {
             // If internationalization is enabled, create resource bundles
             // for each of the locale to be loaded.
-            localesToLoad.forEach(locale -> resourceBundles.put(locale, new CombinedResourceBundle(locale)));
+            for (Locale locale : localesToLoad) {
+                CombinedResourceBundle resourceBundleForLocale = new CombinedResourceBundle(locale);
+                resourceBundles.put(locale, resourceBundleForLocale);
+                bundle = ResourceBundle.getBundle("error/Messages", locale);
+                resourceBundleForLocale.addToResources(bundle);
+            }
         }
-
-        ResourceBundle bundle = ResourceBundle.getBundle("error/Messages", Locale.US);
-        resourceBundles.get(Locale.US).addToResources(bundle);
     }
 
-    public static void addResourcesFromPlugin(URLClassLoader pluginClassLoader, String plugin)
+    public static void addErrorMessagesFromPlugin(URLClassLoader pluginClassLoader, String plugin)
     {
         try {
             ResourceBundle bundle = ResourceBundle.getBundle("error/Messages", Locale.US, pluginClassLoader);
             resourceBundles.get(Locale.US).addToResources(bundle);
         } catch (MissingResourceException e) {
-            log.debug("No bundle available for error/Messages in plugin " + plugin);
+            log.debug("No bundle available for error/Messages in plugin %s", plugin);
         }
 
-        for(Locale locale : localesToLoad) {
-            try {
-                ResourceBundle bundle = ResourceBundle.getBundle("error/Messages", locale, pluginClassLoader);
-                resourceBundles.get(locale).addToResources(bundle);
-            }
-            catch (MissingResourceException e) {
-                log.debug("No bundle available for error/Messages in plugin " + plugin);
+        if (isErrorI18nEnabled) {
+            for (Locale locale : localesToLoad) {
+                try {
+                    ResourceBundle bundle = ResourceBundle.getBundle("error/Messages", locale, pluginClassLoader);
+                    resourceBundles.get(locale).addToResources(bundle);
+                }
+                catch (MissingResourceException e) {
+                    log.debug("No bundle available for error/Messages in plugin %s for locale %s", plugin, locale);
+                }
             }
         }
     }
@@ -81,6 +89,11 @@ public class ErrorRetriever
         }
 
         ResourceBundle selectedBundle = resourceBundles.get(locale);
+        if (selectedBundle == null) {
+            // If we are trying to load a resource we don't have,
+            // load the default resource instead.
+            selectedBundle = resourceBundles.get(Locale.US);
+        }
         return selectedBundle.getString(errorKey);
     }
 }

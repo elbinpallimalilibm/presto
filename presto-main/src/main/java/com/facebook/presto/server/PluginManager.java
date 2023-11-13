@@ -209,7 +209,7 @@ public class PluginManager
         try (ThreadContextClassLoader ignored = new ThreadContextClassLoader(pluginClassLoader)) {
             loadPlugin(pluginClassLoader);
         }
-        ErrorRetriever.addResourcesFromPlugin(pluginClassLoader, plugin);
+        ErrorRetriever.addErrorMessagesFromPlugin(pluginClassLoader, plugin);
         log.info("-- Finished loading plugin %s --", plugin);
     }
 
