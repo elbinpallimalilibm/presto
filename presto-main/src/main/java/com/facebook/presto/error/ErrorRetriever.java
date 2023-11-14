@@ -15,8 +15,12 @@ package com.facebook.presto.error;
 
 import com.facebook.airlift.log.Logger;
 
+import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.Collections;
+import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -29,7 +33,7 @@ import static java.util.Objects.requireNonNull;
 public class ErrorRetriever
 {
     private static boolean isErrorI18nEnabled;
-    private static List<Locale> localesToLoad = Collections.emptyList();
+    private static List<Locale> localesToLoad = Arrays.asList(Locale.FRANCE);
     private static Map<Locale, CombinedResourceBundle> resourceBundles = new HashMap<>();
     private static final Logger log = Logger.get(ErrorRetriever.class);
     private static final Locale defaultLocale = Locale.US;
@@ -52,8 +56,20 @@ public class ErrorRetriever
             for (Locale locale : localesToLoad) {
                 CombinedResourceBundle resourceBundleForLocale = new CombinedResourceBundle(locale);
                 resourceBundles.put(locale, resourceBundleForLocale);
-                bundle = ResourceBundle.getBundle("error/Messages", locale);
-                resourceBundleForLocale.addToResources(bundle);
+            }
+            File resourcesFolder = Paths.get("etc/resources").toFile();
+            if (resourcesFolder.exists() && resourcesFolder.isDirectory()) {
+                try {
+                    URLClassLoader resourcesClassLoader = new URLClassLoader(
+                            new URL[] {(resourcesFolder.toURI().toURL())});
+                    for (Locale locale : localesToLoad) {
+                        bundle = ResourceBundle.getBundle("error/Messages", locale, resourcesClassLoader);
+                        resourceBundles.get(locale).addToResources(bundle);
+                    }
+                }
+                catch (MalformedURLException e) {
+                    log.error("Error loading locale specific Messages.properties", e);
+                }
             }
         }
     }
@@ -96,6 +112,16 @@ public class ErrorRetriever
             // load the default resource instead.
             selectedBundle = resourceBundles.get(defaultLocale);
         }
-        return selectedBundle.getString(errorKey);
+        String errorMessage;
+        try {
+            errorMessage = selectedBundle.getString(errorKey);
+        }
+        catch (MissingResourceException e) {
+            // If the property value was not found in locale specific resource
+            // try loading from default property file.
+            errorMessage = resourceBundles.get(defaultLocale).getString(errorKey);
+        }
+
+        return errorMessage;
     }
 }
