@@ -17,6 +17,7 @@ import com.facebook.presto.Session;
 import com.facebook.presto.common.CatalogSchemaName;
 import com.facebook.presto.common.QualifiedObjectName;
 import com.facebook.presto.common.type.Type;
+import com.facebook.presto.error.ErrorKeys;
 import com.facebook.presto.spi.ColumnMetadata;
 import com.facebook.presto.spi.ConnectorId;
 import com.facebook.presto.spi.ConnectorTableHandle;
@@ -144,7 +145,7 @@ public final class MetadataUtil
         requireNonNull(session, "session is null");
         requireNonNull(name, "name is null");
         if (name.getParts().size() > 3) {
-            throw new PrestoException("SYNTAX_ERROR_TOO_MANY_DOTS_IN_TABLE_NAME", SYNTAX_ERROR, name);
+            throw new PrestoException(ErrorKeys.SYNTAX_ERROR_TOO_MANY_DOTS_IN_TABLE_NAME, SYNTAX_ERROR, name);
         }
 
         List<String> parts = Lists.reverse(name.getParts());
