@@ -13,6 +13,7 @@
  */
 package com.facebook.presto.delta;
 
+import com.facebook.presto.delta.error.DeltaErrorKey;
 import com.facebook.presto.spi.PrestoException;
 
 import java.sql.Timestamp;
@@ -107,7 +108,7 @@ public class DeltaTableName
     {
         Matcher match = TABLE_PATTERN.matcher(tableName);
         if (!match.matches()) {
-            throw new PrestoException("NOT_SUPPORTED_NOT_THE_EXPECTED_TABLE_NAME_FORMAT", NOT_SUPPORTED, tableName);
+            throw new PrestoException(DeltaErrorKey.DELTA_NOT_SUPPORTED_NOT_THE_EXPECTED_TABLE_NAME_FORMAT, NOT_SUPPORTED, tableName);
         }
 
         String tableNameOrPath = match.group(TABLE_GROUP_NAME);

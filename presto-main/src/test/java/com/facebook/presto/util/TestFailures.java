@@ -13,6 +13,7 @@
  */
 package com.facebook.presto.util;
 
+import com.facebook.presto.error.ErrorKeys;
 import com.facebook.presto.execution.ExecutionFailureInfo;
 import com.facebook.presto.spi.PrestoException;
 import org.testng.annotations.Test;
@@ -79,7 +80,7 @@ public class TestFailures
     @Test
     public void testToLocalisedPrestoException()
     {
-        Throwable syntaxError = new PrestoException("SYNTAX_ERROR_TOO_MANY_DOTS_IN_TABLE_NAME", SYNTAX_ERROR, "fake_table");
+        Throwable syntaxError = new PrestoException(ErrorKeys.SYNTAX_ERROR_TOO_MANY_DOTS_IN_TABLE_NAME, SYNTAX_ERROR, "fake_table");
         Throwable localisedError = Failures.toLocalisedPrestoException(syntaxError, Locale.US);
 
         assertEquals(localisedError.getClass(), PrestoException.class);
@@ -94,7 +95,7 @@ public class TestFailures
     @Test
     public void testToFailureWithLocalisedPrestoException()
     {
-        Throwable syntaxError = new PrestoException("SYNTAX_ERROR_TOO_MANY_DOTS_IN_TABLE_NAME", SYNTAX_ERROR, "fake_table");
+        Throwable syntaxError = new PrestoException(ErrorKeys.SYNTAX_ERROR_TOO_MANY_DOTS_IN_TABLE_NAME, SYNTAX_ERROR, "fake_table");
         Throwable localisedError = Failures.toLocalisedPrestoException(syntaxError, Locale.US);
 
         ExecutionFailureInfo failureInfo = toFailure(localisedError);
@@ -111,7 +112,7 @@ public class TestFailures
     @Test
     public void testToFailureCatchAllScenario()
     {
-        Throwable syntaxError = new PrestoException("SYNTAX_ERROR_TOO_MANY_DOTS_IN_TABLE_NAME", SYNTAX_ERROR, "fake_table");
+        Throwable syntaxError = new PrestoException(ErrorKeys.SYNTAX_ERROR_TOO_MANY_DOTS_IN_TABLE_NAME, SYNTAX_ERROR, "fake_table");
 
         ExecutionFailureInfo failureInfo = toFailure(syntaxError);
         assertEquals(failureInfo.getType(), "com.facebook.presto.spi.PrestoException");

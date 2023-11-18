@@ -19,6 +19,7 @@ import com.facebook.presto.common.predicate.ValueSet;
 import com.facebook.presto.common.type.StandardTypes;
 import com.facebook.presto.common.type.Type;
 import com.facebook.presto.common.type.TypeManager;
+import com.facebook.presto.delta.error.DeltaErrorKey;
 import com.facebook.presto.spi.ColumnHandle;
 import com.facebook.presto.spi.PrestoException;
 import com.google.common.collect.ImmutableList;
@@ -240,12 +241,12 @@ public final class DeltaExpressionUtils
                     Boolean booleanValue = Boolean.valueOf(partitionValue);
                     return Domain.create(ValueSet.of(type, booleanValue), false);
                 default:
-                    throw new PrestoException("DELTA_UNSUPPORTED_COLUMN_TYPE_UNSUPPORTED_DATATYPE_FOR_PARTITION_COLUMN",
+                    throw new PrestoException(DeltaErrorKey.DELTA_UNSUPPORTED_COLUMN_TYPE_UNSUPPORTED_DATATYPE_FOR_PARTITION_COLUMN,
                             DELTA_UNSUPPORTED_COLUMN_TYPE, columnHandle.getDataType(), columnHandle.getName());
             }
         }
         catch (IllegalArgumentException exception) {
-            throw new PrestoException("DELTA_INVALID_PARTITION_VALUE_CANNOT_PARSE_PARTITION_VALUE_IN_FILE",
+            throw new PrestoException(DeltaErrorKey.DELTA_INVALID_PARTITION_VALUE_CANNOT_PARSE_PARTITION_VALUE_IN_FILE,
                     DELTA_INVALID_PARTITION_VALUE, exception, partitionValue, columnHandle.getDataType(), columnHandle.getName(), filePath);
         }
     }

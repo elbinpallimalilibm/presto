@@ -22,6 +22,7 @@ import com.facebook.presto.common.predicate.Domain;
 import com.facebook.presto.common.predicate.TupleDomain;
 import com.facebook.presto.common.type.Type;
 import com.facebook.presto.common.type.TypeManager;
+import com.facebook.presto.delta.error.DeltaErrorKey;
 import com.facebook.presto.hive.FileFormatDataSourceStats;
 import com.facebook.presto.hive.HdfsContext;
 import com.facebook.presto.hive.HdfsEnvironment;
@@ -348,10 +349,10 @@ public class DeltaPageSourceProvider
             }
             String message = format("Error opening Hive split %s (offset=%s, length=%s): %s", path, start, length, exception.getMessage());
             if (exception.getClass().getSimpleName().equals("BlockMissingException")) {
-                throw new PrestoException("DELTA_MISSING_DATA_ERROR_OPENING_HIVE_SPLIT",
+                throw new PrestoException(DeltaErrorKey.DELTA_MISSING_DATA_ERROR_OPENING_HIVE_SPLIT,
                         DELTA_MISSING_DATA, exception, path, start, length, exception.getMessage());
             }
-            throw new PrestoException("DELTA_CANNOT_OPEN_SPLIT_OPENING_HIVE_SPLIT", DELTA_CANNOT_OPEN_SPLIT, exception, path, start, length, exception.getMessage());
+            throw new PrestoException(DeltaErrorKey.DELTA_CANNOT_OPEN_SPLIT_OPENING_HIVE_SPLIT, DELTA_CANNOT_OPEN_SPLIT, exception, path, start, length, exception.getMessage());
         }
     }
 
@@ -406,7 +407,7 @@ public class DeltaPageSourceProvider
                 group.writeToStringBuilder(builder, "");
                 parquetTypeName = builder.toString();
             }
-            throw new PrestoException("DELTA_PARQUET_SCHEMA_MISMATCH_COLUMN_TYPE_DECLARED_MISMATCH",
+            throw new PrestoException(DeltaErrorKey.DELTA_PARQUET_SCHEMA_MISMATCH_COLUMN_TYPE_DECLARED_MISMATCH,
                     DELTA_PARQUET_SCHEMA_MISMATCH,
                     column.getName(),
                     tableName.toString(),

@@ -21,6 +21,7 @@ import com.facebook.presto.common.type.Type;
 import com.facebook.presto.common.type.TypeSignature;
 import com.facebook.presto.common.type.TypeSignatureParameter;
 import com.facebook.presto.common.type.VarcharType;
+import com.facebook.presto.delta.error.DeltaErrorKey;
 import com.facebook.presto.spi.PrestoException;
 import com.facebook.presto.spi.SchemaTableName;
 import com.google.common.collect.ImmutableList;
@@ -183,11 +184,11 @@ public class DeltaTypeUtils
                 // Delta partition serialized value contains up to the second precision
                 return Timestamp.valueOf(valueString).toLocalDateTime().toEpochSecond(ZoneOffset.UTC) * 1_000;
             }
-            throw new PrestoException("DELTA_UNSUPPORTED_COLUMN_TYPE_UNSUPPORTED_DATATYPE_FOR_PARTITION_COLUMN",
+            throw new PrestoException(DeltaErrorKey.DELTA_UNSUPPORTED_COLUMN_TYPE_UNSUPPORTED_DATATYPE_FOR_PARTITION_COLUMN,
                     DELTA_UNSUPPORTED_COLUMN_TYPE, type, columnName);
         }
         catch (IllegalArgumentException | DateTimeParseException e) {
-            throw new PrestoException("DELTA_INVALID_PARTITION_VALUE_CANNOT_PARSE_PARTITION_VALUE",
+            throw new PrestoException(DeltaErrorKey.DELTA_INVALID_PARTITION_VALUE_CANNOT_PARSE_PARTITION_VALUE,
                     DELTA_INVALID_PARTITION_VALUE, e, valueString, type, columnName);
         }
     }
@@ -232,7 +233,7 @@ public class DeltaTypeUtils
             return TIMESTAMP;
         }
 
-        throw new PrestoException("DELTA_UNSUPPORTED_COLUMN_TYPE_COLUMN_CONTAINS_UNSUPPORTED_DATATYPE",
+        throw new PrestoException(DeltaErrorKey.DELTA_UNSUPPORTED_COLUMN_TYPE_COLUMN_CONTAINS_UNSUPPORTED_DATATYPE,
                 DELTA_UNSUPPORTED_COLUMN_TYPE, columnName, tableName, deltaType.getCatalogString());
     }
 }

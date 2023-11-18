@@ -14,20 +14,21 @@
 package com.facebook.presto.spi;
 
 import com.facebook.presto.common.ErrorCode;
+import com.facebook.presto.spi.error.BaseErrorKey;
 
 public class PrestoException
         extends RuntimeException
 {
     private final ErrorCode errorCode;
     private final ErrorCodeSupplier errorCodeSupplier;
-    private final String errorKey;
+    private final BaseErrorKey errorKey;
     private final Object[] args;
 
     public PrestoException(ErrorCodeSupplier errorCode, String message)
     {
         this(errorCode, message, null);
     }
-    public PrestoException(String errorKey, ErrorCodeSupplier errorCodeSupplier, Object...args)
+    public PrestoException(BaseErrorKey errorKey, ErrorCodeSupplier errorCodeSupplier, Object...args)
     {
         this(errorKey, errorCodeSupplier, null, args);
     }
@@ -46,7 +47,7 @@ public class PrestoException
         this.args = null;
     }
 
-    public PrestoException(String errorKey, ErrorCodeSupplier errorCodeSupplier, Throwable cause, Object...args)
+    public PrestoException(BaseErrorKey errorKey, ErrorCodeSupplier errorCodeSupplier, Throwable cause, Object...args)
     {
         super(cause);
         this.errorCodeSupplier = errorCodeSupplier;
@@ -67,7 +68,7 @@ public class PrestoException
 
     public String getErrorKey()
     {
-        return errorKey;
+        return errorKey.name();
     }
 
     public Object[] getArgs()

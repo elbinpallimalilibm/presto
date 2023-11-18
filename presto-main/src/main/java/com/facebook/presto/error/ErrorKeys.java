@@ -13,7 +13,9 @@
  */
 package com.facebook.presto.error;
 
-public enum ErrorKeys
+import com.facebook.presto.spi.error.BaseErrorKey;
+
+public enum ErrorKeys implements BaseErrorKey
 {
     GENERIC_USER_ERROR_FUNCTION_LANGUAGE_NOT_SUPPORTED,
     GENERIC_USER_ERROR_FUNCTION_ID_MISSING,
