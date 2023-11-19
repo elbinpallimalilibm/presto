@@ -15,29 +15,29 @@ package com.facebook.presto.error;
 
 import org.testng.annotations.Test;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
-import java.util.ResourceBundle;
+import java.util.Properties;
 
-import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.fail;
 
 public class TestErrorKeys
 {
     @Test
     public void testIfAllErrorKeysAreDefined()
+            throws IOException
     {
-        ResourceBundle bundle = ResourceBundle.getBundle("error/Messages", Locale.US);
-        assertNotNull(bundle, "Unable to get Messages resource bundle");
+        Properties errorMessages = new Properties();
+        errorMessages.load(this.getClass().getClassLoader().getResourceAsStream("error/Messages.properties"));
         List<ErrorKeys> errorKeysWithoutValues = new ArrayList<>();
         for (ErrorKeys errorKey : ErrorKeys.values()) {
-            if (!bundle.containsKey(errorKey.name())) {
+            if (!errorMessages.containsKey(errorKey.name())) {
                 errorKeysWithoutValues.add(errorKey);
             }
         }
         if (errorKeysWithoutValues.size() > 0) {
-            fail("Messages resource bundle does not contain values for " + errorKeysWithoutValues);
+            fail("Messages.properties does not contain values for " + errorKeysWithoutValues);
         }
     }
 }
