@@ -20,12 +20,12 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Paths;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.MissingResourceException;
+import java.util.Optional;
 import java.util.ResourceBundle;
 
 import static java.util.Objects.requireNonNull;
@@ -33,7 +33,6 @@ import static java.util.Objects.requireNonNull;
 public class ErrorRetriever
 {
     private static boolean isErrorI18nEnabled;
-    private static List<Locale> localesToLoad = Arrays.asList(Locale.FRANCE);
     private static Map<Locale, CombinedResourceBundle> resourceBundles = new HashMap<>();
     private static final Logger log = Logger.get(ErrorRetriever.class);
     private static final Locale defaultLocale = Locale.US;
@@ -53,6 +52,9 @@ public class ErrorRetriever
         if (isErrorI18nEnabled) {
             // If internationalization is enabled, create resource bundles
             // for each of the locale to be loaded.
+            List<Locale> localesToLoad = ErrorLocalesUtil.getAvailableErrorMessageLocales();
+            log.info("Locales to load %s", localesToLoad);
+
             for (Locale locale : localesToLoad) {
                 CombinedResourceBundle resourceBundleForLocale = new CombinedResourceBundle(locale);
                 resourceBundles.put(locale, resourceBundleForLocale);
@@ -68,7 +70,7 @@ public class ErrorRetriever
                     }
                 }
                 catch (MalformedURLException e) {
-                    log.error("Error loading locale specific Messages.properties", e);
+                    log.error(e, "Error loading locale specific Messages.properties");
                 }
             }
         }
@@ -76,15 +78,20 @@ public class ErrorRetriever
 
     public static void addErrorMessagesFromPlugin(URLClassLoader pluginClassLoader, String plugin)
     {
+        Optional<ResourceBundle> defaultBundle = Optional.empty();
         try {
-            ResourceBundle bundle = ResourceBundle.getBundle("error/Messages", defaultLocale, pluginClassLoader);
-            resourceBundles.get(defaultLocale).addToResources(bundle);
+            defaultBundle = Optional.of(ResourceBundle.getBundle("error/Messages", defaultLocale, pluginClassLoader));
+            resourceBundles.get(defaultLocale).addToResources(defaultBundle.get());
         }
         catch (MissingResourceException e) {
             log.debug("No bundle available for error/Messages in plugin %s", plugin);
         }
 
-        if (isErrorI18nEnabled) {
+        // We need atleast the default Messages bundle before we try loading the
+        // localized bundles
+        if (defaultBundle.isPresent() && isErrorI18nEnabled) {
+            List<Locale> localesToLoad = ErrorLocalesUtil.getAvailableErrorMessageLocalesForPlugin(pluginClassLoader);
+            log.info("Plugin %s locales to load %s", plugin, localesToLoad);
             for (Locale locale : localesToLoad) {
                 try {
                     ResourceBundle bundle = ResourceBundle.getBundle("error/Messages", locale, pluginClassLoader);
