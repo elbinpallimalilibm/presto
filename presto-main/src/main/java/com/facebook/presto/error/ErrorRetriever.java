@@ -95,6 +95,12 @@ public class ErrorRetriever
             for (Locale locale : localesToLoad) {
                 try {
                     ResourceBundle bundle = ResourceBundle.getBundle("error/Messages", locale, pluginClassLoader);
+                    // If the locale we are trying to load was not present in presto-main
+                    // we will create a CombinedResourceBundle for this locale by copying
+                    // the default locale.
+                    if (!resourceBundles.containsKey(locale)) {
+                        resourceBundles.put(locale, resourceBundles.get(defaultLocale));
+                    }
                     resourceBundles.get(locale).addToResources(bundle);
                 }
                 catch (MissingResourceException e) {
