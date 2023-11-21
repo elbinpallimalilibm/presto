@@ -31,7 +31,6 @@ import com.facebook.presto.spi.WarningCollector;
 import com.facebook.presto.spi.prerequisites.QueryPrerequisites;
 import com.facebook.presto.spi.prerequisites.QueryPrerequisitesContext;
 import com.facebook.presto.spi.resourceGroups.ResourceGroupQueryLimits;
-import com.facebook.presto.util.Failures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.SettableFuture;
 import io.airlift.units.DataSize;

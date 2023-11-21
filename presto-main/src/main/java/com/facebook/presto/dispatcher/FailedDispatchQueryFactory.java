@@ -19,7 +19,6 @@ import com.facebook.presto.execution.ExecutionFailureInfo;
 import com.facebook.presto.execution.LocationFactory;
 import com.facebook.presto.server.BasicQueryInfo;
 import com.facebook.presto.spi.resourceGroups.ResourceGroupId;
-import com.facebook.presto.util.Failures;
 
 import javax.inject.Inject;
 

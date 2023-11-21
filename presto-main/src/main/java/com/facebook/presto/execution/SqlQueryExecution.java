@@ -63,7 +63,6 @@ import com.facebook.presto.sql.planner.SplitSourceFactory;
 import com.facebook.presto.sql.planner.SubPlan;
 import com.facebook.presto.sql.planner.optimizations.PlanOptimizer;
 import com.facebook.presto.sql.planner.sanity.PlanChecker;
-import com.facebook.presto.util.Failures;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.util.concurrent.ListenableFuture;
 import io.airlift.units.DataSize;

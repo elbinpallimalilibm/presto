@@ -13,15 +13,11 @@
  */
 package com.facebook.presto.util;
 
-import com.facebook.presto.error.ErrorKeys;
 import com.facebook.presto.execution.ExecutionFailureInfo;
 import com.facebook.presto.spi.PrestoException;
 import org.testng.annotations.Test;
 
-import java.util.Locale;
-
 import static com.facebook.presto.spi.StandardErrorCode.GENERIC_INTERNAL_ERROR;
-import static com.facebook.presto.spi.StandardErrorCode.SYNTAX_ERROR;
 import static com.facebook.presto.spi.StandardErrorCode.TOO_MANY_REQUESTS_FAILED;
 import static com.facebook.presto.util.Failures.toFailure;
 import static org.testng.Assert.assertEquals;

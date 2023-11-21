@@ -20,7 +20,6 @@ public class PrestoException
         extends RuntimeException
 {
     private final ErrorCode errorCode;
-    private final ErrorCodeSupplier errorCodeSupplier;
     private final BaseErrorKey errorKey;
     private final Object[] args;
 
@@ -42,7 +41,6 @@ public class PrestoException
     {
         super(message, cause);
         this.errorCode = errorCodeSupplier.toErrorCode();
-        this.errorCodeSupplier = errorCodeSupplier;
         this.errorKey = null;
         this.args = null;
     }
@@ -50,7 +48,6 @@ public class PrestoException
     public PrestoException(BaseErrorKey errorKey, ErrorCodeSupplier errorCodeSupplier, Throwable cause, Object...args)
     {
         super(cause);
-        this.errorCodeSupplier = errorCodeSupplier;
         this.errorKey = errorKey;
         this.errorCode = errorCodeSupplier.toErrorCode();
         this.args = args;
@@ -59,11 +56,6 @@ public class PrestoException
     public ErrorCode getErrorCode()
     {
         return errorCode;
-    }
-
-    public ErrorCodeSupplier getErrorCodeSupplier()
-    {
-        return errorCodeSupplier;
     }
 
     public BaseErrorKey getErrorKey()

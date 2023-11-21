@@ -14,13 +14,11 @@
 package com.facebook.presto.delta;
 
 import com.facebook.presto.spi.PrestoException;
-import com.facebook.presto.util.Failures;
 import org.testng.annotations.Test;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
-import java.util.Locale;
 import java.util.Optional;
 
 import static org.testng.Assert.assertEquals;
