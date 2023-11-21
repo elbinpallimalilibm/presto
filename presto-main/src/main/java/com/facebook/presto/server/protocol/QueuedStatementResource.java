@@ -31,6 +31,7 @@ import com.facebook.presto.server.ServerConfig;
 import com.facebook.presto.server.SessionContext;
 import com.facebook.presto.spi.PrestoException;
 import com.facebook.presto.spi.QueryId;
+import com.facebook.presto.spi.error.ErrorKeyStruct;
 import com.facebook.presto.sql.parser.SqlParserOptions;
 import com.facebook.presto.tracing.TracerProviderManager;
 import com.google.common.collect.ImmutableList;
@@ -657,7 +658,9 @@ public class QueuedStatementResource
             Locale clientLocale = localeBuilder.setLanguageTag(sessionContext.getLanguage()).build();
             String errorMessage;
             if (executionFailureInfo.getErrorKey() != null) {
-                errorMessage = ErrorRetriever.getErrorMessage(executionFailureInfo.getErrorKey().getName(), clientLocale);
+                ErrorKeyStruct errorKey = executionFailureInfo.getErrorKey();
+                Object[] args = errorKey.getArgs().toArray(new Object[0]);
+                errorMessage = String.format(ErrorRetriever.getErrorMessage(errorKey.getMessage(), clientLocale), args);
             }
             else {
                 errorMessage = executionFailureInfo.getMessage();

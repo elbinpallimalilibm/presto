@@ -38,6 +38,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static com.facebook.presto.spi.ErrorCause.UNKNOWN;
 import static com.facebook.presto.spi.StandardErrorCode.GENERIC_INTERNAL_ERROR;
@@ -116,7 +117,8 @@ public final class Failures
         }
 
         if (seenFailures.contains(throwable)) {
-            return new ExecutionFailureInfo(type, "[cyclic] " + throwable.getMessage(), null, ImmutableList.of(), ImmutableList.of(), null, GENERIC_INTERNAL_ERROR.toErrorCode(), remoteHost, UNKNOWN, null);
+            return new ExecutionFailureInfo(type, "[cyclic] " + throwable.getMessage(), null, ImmutableList.of(), ImmutableList.of(), null,
+                    GENERIC_INTERNAL_ERROR.toErrorCode(), remoteHost, UNKNOWN, null);
         }
         seenFailures.add(throwable);
 
@@ -190,7 +192,9 @@ public final class Failures
         requireNonNull(throwable);
 
         if (throwable instanceof PrestoException) {
-            return new ErrorKeyStruct(((PrestoException) throwable).getErrorKey().name());
+            PrestoException e = (PrestoException) throwable;
+            List<String> args = Arrays.stream(e.getArgs()).map(o -> o.toString()).collect(Collectors.toList());
+            return new ErrorKeyStruct(e.getErrorKey().name(), args);
         }
 
         return null;
