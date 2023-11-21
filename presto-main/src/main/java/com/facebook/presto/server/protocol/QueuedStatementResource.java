@@ -22,6 +22,7 @@ import com.facebook.presto.common.ErrorCode;
 import com.facebook.presto.dispatcher.DispatchExecutor;
 import com.facebook.presto.dispatcher.DispatchInfo;
 import com.facebook.presto.dispatcher.DispatchManager;
+import com.facebook.presto.error.ErrorRetriever;
 import com.facebook.presto.execution.ExecutionFailureInfo;
 import com.facebook.presto.execution.QueryState;
 import com.facebook.presto.metadata.SessionPropertyManager;
@@ -65,6 +66,7 @@ import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
 import java.net.URI;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
@@ -651,6 +653,16 @@ public class QueuedStatementResource
 
         private QueryError toQueryError(ExecutionFailureInfo executionFailureInfo)
         {
+            Locale.Builder localeBuilder = new Locale.Builder();
+            Locale clientLocale = localeBuilder.setLanguageTag(sessionContext.getLanguage()).build();
+            String errorMessage;
+            if (executionFailureInfo.getErrorKey() != null) {
+                errorMessage = ErrorRetriever.getErrorMessage(executionFailureInfo.getErrorKey().getName(), clientLocale);
+            }
+            else {
+                errorMessage = executionFailureInfo.getMessage();
+            }
+
             ErrorCode errorCode;
             if (executionFailureInfo.getErrorCode() != null) {
                 errorCode = executionFailureInfo.getErrorCode();
@@ -661,7 +673,7 @@ public class QueuedStatementResource
             }
 
             return new QueryError(
-                    firstNonNull(executionFailureInfo.getMessage(), "Internal error"),
+                    firstNonNull(errorMessage, "Internal error"),
                     null,
                     errorCode.getCode(),
                     errorCode.getName(),
