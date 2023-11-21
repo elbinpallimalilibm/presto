@@ -257,7 +257,6 @@ public abstract class DataDefinitionExecution<T extends Statement>
     @Override
     public void fail(Throwable cause)
     {
-        cause = Failures.toLocalisedPrestoException(cause, getSession().getLocale());
         stateMachine.transitionToFailed(cause);
         stateMachine.updateQueryInfo(Optional.empty());
     }

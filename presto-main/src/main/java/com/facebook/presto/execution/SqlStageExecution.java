@@ -669,7 +669,8 @@ public final class SqlStageExecution
                 executionFailureInfo.getErrorLocation(),
                 REMOTE_HOST_GONE.toErrorCode(),
                 executionFailureInfo.getRemoteHost(),
-                executionFailureInfo.getErrorCause());
+                executionFailureInfo.getErrorCause(),
+                executionFailureInfo.getErrorKey());
     }
 
     @Override

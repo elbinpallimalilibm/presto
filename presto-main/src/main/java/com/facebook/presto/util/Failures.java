@@ -26,6 +26,8 @@ import com.facebook.presto.spi.HostAddress;
 import com.facebook.presto.spi.PrestoException;
 import com.facebook.presto.spi.PrestoTransportException;
 import com.facebook.presto.spi.StandardErrorCode;
+import com.facebook.presto.spi.error.BaseErrorKey;
+import com.facebook.presto.spi.error.ErrorKeyStruct;
 import com.facebook.presto.sql.analyzer.SemanticException;
 import com.facebook.presto.sql.parser.ParsingException;
 import com.facebook.presto.sql.tree.NodeLocation;
@@ -66,7 +68,7 @@ public final class Failures
 
     public static ExecutionFailureInfo toFailure(Throwable failure)
     {
-        return toFailure(failure, newIdentityHashSet(), false);
+        return toFailure(failure, newIdentityHashSet());
     }
 
     public static void checkArgument(boolean expression, String errorMessage)
@@ -97,16 +99,10 @@ public final class Failures
                 .collect(toImmutableList());
     }
 
-    private static ExecutionFailureInfo toFailure(Throwable throwable, Set<Throwable> seenFailures, boolean doNotLocaliseException)
+    private static ExecutionFailureInfo toFailure(Throwable throwable, Set<Throwable> seenFailures)
     {
         if (throwable == null) {
             return null;
-        }
-
-        // If somehow we got a PrestoException that has an error key and no error message
-        // create a new PrestoException using en_US locale.
-        if (!doNotLocaliseException) {
-            throwable = toLocalisedPrestoException(throwable, Locale.US);
         }
 
         String type;
@@ -123,12 +119,12 @@ public final class Failures
         }
 
         if (seenFailures.contains(throwable)) {
-            return new ExecutionFailureInfo(type, "[cyclic] " + throwable.getMessage(), null, ImmutableList.of(), ImmutableList.of(), null, GENERIC_INTERNAL_ERROR.toErrorCode(), remoteHost, UNKNOWN);
+            return new ExecutionFailureInfo(type, "[cyclic] " + throwable.getMessage(), null, ImmutableList.of(), ImmutableList.of(), null, GENERIC_INTERNAL_ERROR.toErrorCode(), remoteHost, UNKNOWN, null);
         }
         seenFailures.add(throwable);
 
         // Do not need to localise the inner exception
-        ExecutionFailureInfo cause = toFailure(throwable.getCause(), seenFailures, true);
+        ExecutionFailureInfo cause = toFailure(throwable.getCause(), seenFailures);
         ErrorCode errorCode = toErrorCode(throwable);
         if (errorCode == null) {
             if (cause == null) {
@@ -139,18 +135,21 @@ public final class Failures
             }
         }
 
+        ErrorKeyStruct errorKey = toErrorKey(throwable);
+
         return new ExecutionFailureInfo(
                 type,
                 throwable.getMessage(),
                 cause,
                 Arrays.stream(throwable.getSuppressed())
-                        .map(failure -> toFailure(failure, seenFailures, true))
+                        .map(failure -> toFailure(failure, seenFailures))
                         .collect(toImmutableList()),
                 Lists.transform(asList(throwable.getStackTrace()), toStringFunction()),
                 getErrorLocation(throwable),
                 errorCode,
                 remoteHost,
-                toErrorCause(throwable));
+                toErrorCause(throwable),
+                errorKey);
     }
 
     @Nullable
@@ -188,6 +187,18 @@ public final class Failures
         return null;
     }
 
+    @Nullable
+    private static ErrorKeyStruct toErrorKey(Throwable throwable)
+    {
+        requireNonNull(throwable);
+
+        if (throwable instanceof PrestoException) {
+            return new ErrorKeyStruct(((PrestoException) throwable).getErrorKey().name());
+        }
+
+        return null;
+    }
+
     private static ErrorCause toErrorCause(Throwable throwable)
     {
         requireNonNull(throwable);
@@ -203,19 +214,5 @@ public final class Failures
         throwIfInstanceOf(t, Error.class);
         throwIfInstanceOf(t, PrestoException.class);
         return new PrestoException(StandardErrorCode.GENERIC_INTERNAL_ERROR, t);
-    }
-
-    public static Throwable toLocalisedPrestoException(Throwable t, Locale locale)
-    {
-        if (t.getClass() == PrestoException.class && ((PrestoException) t).getErrorKey() != null) {
-            try {
-                PrestoException ex = (PrestoException) t;
-                return new PrestoException(ex.getErrorCodeSupplier(), String.format(ErrorRetriever.getErrorMessage(ex.getErrorKey(), locale), ex.getArgs()), t);
-            }
-            catch (Exception e) {
-                log.error(e, "Error creating PrestoException");
-            }
-        }
-        return t;
     }
 }

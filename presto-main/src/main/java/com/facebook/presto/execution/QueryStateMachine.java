@@ -841,7 +841,6 @@ public class QueryStateMachine
                 @Override
                 public void onFailure(Throwable throwable)
                 {
-                    throwable = Failures.toLocalisedPrestoException(throwable, getSession().getLocale());
                     transitionToFailed(throwable, currentState -> !currentState.isDone());
                 }
             }, directExecutor());

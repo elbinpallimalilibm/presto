@@ -716,7 +716,6 @@ public class SqlQueryExecution
     {
         requireNonNull(cause, "cause is null");
 
-        cause = Failures.toLocalisedPrestoException(cause, getSession().getLocale());
         stateMachine.transitionToFailed(cause);
 
         // acquire reference to scheduler before checking finalQueryInfo, because

@@ -21,6 +21,7 @@ import com.facebook.presto.client.FailureInfo;
 import com.facebook.presto.common.ErrorCode;
 import com.facebook.presto.spi.ErrorCause;
 import com.facebook.presto.spi.HostAddress;
+import com.facebook.presto.spi.error.ErrorKeyStruct;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.collect.ImmutableList;
@@ -53,6 +54,7 @@ public class ExecutionFailureInfo
     // use for transport errors
     private final HostAddress remoteHost;
     private final ErrorCause errorCause;
+    private final ErrorKeyStruct errorKey;
 
     @JsonCreator
     @ThriftConstructor
@@ -65,7 +67,8 @@ public class ExecutionFailureInfo
             @JsonProperty("errorLocation") @Nullable ErrorLocation errorLocation,
             @JsonProperty("errorCode") @Nullable ErrorCode errorCode,
             @JsonProperty("remoteHost") @Nullable HostAddress remoteHost,
-            @JsonProperty("errorCause") @Nullable ErrorCause errorCause)
+            @JsonProperty("errorCause") @Nullable ErrorCause errorCause,
+            @JsonProperty("errorKey") @Nullable ErrorKeyStruct errorKey)
     {
         requireNonNull(type, "type is null");
         requireNonNull(suppressed, "suppressed is null");
@@ -80,6 +83,7 @@ public class ExecutionFailureInfo
         this.errorCode = errorCode;
         this.remoteHost = remoteHost;
         this.errorCause = errorCause;
+        this.errorKey = errorKey;
     }
 
     @JsonProperty
@@ -149,6 +153,14 @@ public class ExecutionFailureInfo
     public ErrorCause getErrorCause()
     {
         return errorCause;
+    }
+
+    @Nullable
+    @JsonProperty
+    @ThriftField(10)
+    public ErrorKeyStruct getErrorKey()
+    {
+        return errorKey;
     }
 
     public FailureInfo toFailureInfo()

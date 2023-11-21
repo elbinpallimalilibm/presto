@@ -78,7 +78,6 @@ public class TestDeltaTypeUtils
             fail("expected to fail");
         }
         catch (PrestoException e) {
-            e = (PrestoException) Failures.toLocalisedPrestoException(e, Locale.US);
             assertEquals(e.getErrorCode(), DELTA_INVALID_PARTITION_VALUE.toErrorCode());
             assertTrue(e.getMessage().matches("Can not parse partition value .* of type .* for partition column 'p1'"));
         }

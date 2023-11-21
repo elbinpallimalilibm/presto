@@ -66,9 +66,9 @@ public class PrestoException
         return errorCodeSupplier;
     }
 
-    public String getErrorKey()
+    public BaseErrorKey getErrorKey()
     {
-        return errorKey.name();
+        return errorKey;
     }
 
     public Object[] getArgs()

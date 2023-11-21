@@ -45,7 +45,6 @@ public class FailedDispatchQueryFactory
 
     public FailedDispatchQuery createFailedDispatchQuery(Session session, String query, Optional<ResourceGroupId> resourceGroup, Throwable throwable)
     {
-        throwable = Failures.toLocalisedPrestoException(throwable, session.getLocale());
         ExecutionFailureInfo failure = toFailure(throwable);
         FailedDispatchQuery failedDispatchQuery = new FailedDispatchQuery(
                 session,

@@ -91,7 +91,6 @@ public class TestDeltaTableName
             fail("expected the above call to fail");
         }
         catch (PrestoException exception) {
-            exception = (PrestoException) Failures.toLocalisedPrestoException(exception, Locale.US);
             assertTrue(exception.getMessage().contains(expErrorMessage), exception.getMessage());
         }
     }
