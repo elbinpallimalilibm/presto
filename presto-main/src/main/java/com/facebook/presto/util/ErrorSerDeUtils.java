@@ -13,8 +13,6 @@
  */
 package com.facebook.presto.util;
 
-import com.facebook.presto.spi.error.ErrorArg;
-
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -29,24 +27,24 @@ public class ErrorSerDeUtils
     private ErrorSerDeUtils()
     {}
 
-    public static List<ErrorArg> convertObjectArrayToBytes(Object[] objects)
+    public static List<List<Byte>> convertObjectArrayToBytes(Object[] objects)
             throws IOException
     {
-        List<ErrorArg> listOfLists = new ArrayList<>();
+        List<List<Byte>> listOfLists = new ArrayList<>();
         for (Object o : objects) {
-            listOfLists.add(new ErrorArg(serializeData(getSanitizedObject(o))));
+            listOfLists.add(serializeData(getSanitizedObject(o)));
         }
 
         return listOfLists;
     }
 
-    public static Object[] convertBytesToObjectArray(List<ErrorArg> listOfArgs)
+    public static Object[] convertBytesToObjectArray(List<List<Byte>> listOfArgs)
             throws IOException, ClassNotFoundException
     {
         Object[] objects = new Object[listOfArgs.size()];
         int i = 0;
-        for (ErrorArg arg : listOfArgs) {
-            objects[i++] = deserializeData(arg.getArg());
+        for (List<Byte> arg : listOfArgs) {
+            objects[i++] = deserializeData(arg);
         }
 
         return objects;

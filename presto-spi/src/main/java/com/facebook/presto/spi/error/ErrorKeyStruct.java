@@ -25,11 +25,11 @@ import java.util.List;
 public class ErrorKeyStruct
 {
     private final String message;
-    private final List<ErrorArg> args;
+    private final List<List<Byte>> args;
 
     @JsonCreator
     @ThriftConstructor
-    public ErrorKeyStruct(@JsonProperty("message") String message, @JsonProperty("args") List<ErrorArg> args)
+    public ErrorKeyStruct(@JsonProperty("message") String message, @JsonProperty("args") List<List<Byte>> args)
     {
         this.args = args;
         this.message = message;
@@ -44,7 +44,7 @@ public class ErrorKeyStruct
 
     @JsonProperty
     @ThriftField(2)
-    public List<ErrorArg> getArgs()
+    public List<List<Byte>> getArgs()
     {
         return args;
     }
