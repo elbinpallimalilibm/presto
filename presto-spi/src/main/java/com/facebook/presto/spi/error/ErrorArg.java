@@ -22,30 +22,22 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 
 @ThriftStruct
-public class ErrorKeyStruct
+public class ErrorArg
 {
-    private final String message;
-    private final List<ErrorArg> args;
+
+    private final List<Byte> arg;
 
     @JsonCreator
     @ThriftConstructor
-    public ErrorKeyStruct(@JsonProperty("message") String message, @JsonProperty("args") List<ErrorArg> args)
+    public ErrorArg(@JsonProperty("arg") List<Byte> arg)
     {
-        this.args = args;
-        this.message = message;
+        this.arg = arg;
     }
 
     @JsonProperty
     @ThriftField(1)
-    public String getMessage()
+    public List<Byte> getArg()
     {
-        return message;
-    }
-
-    @JsonProperty
-    @ThriftField(2)
-    public List<ErrorArg> getArgs()
-    {
-        return args;
+        return arg;
     }
 }

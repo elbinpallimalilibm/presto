@@ -34,6 +34,7 @@ import com.facebook.presto.spi.QueryId;
 import com.facebook.presto.spi.error.ErrorKeyStruct;
 import com.facebook.presto.sql.parser.SqlParserOptions;
 import com.facebook.presto.tracing.TracerProviderManager;
+import com.facebook.presto.util.ErrorSerDeUtils;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Ordering;
@@ -66,6 +67,7 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
+import java.io.IOException;
 import java.net.URI;
 import java.util.Locale;
 import java.util.Map;
@@ -659,7 +661,15 @@ public class QueuedStatementResource
             String errorMessage;
             if (executionFailureInfo.getErrorKey() != null) {
                 ErrorKeyStruct errorKey = executionFailureInfo.getErrorKey();
-                Object[] args = errorKey.getArgs().toArray(new Object[0]);
+                Object[] args;
+                try {
+                    args = ErrorSerDeUtils.convertBytesToObjectArray(errorKey.getArgs());
+                }
+                catch (IOException | ClassNotFoundException e)
+                {
+                    log.error(e, "Error converting list of bytes to object array");
+                    args = new Object[0];
+                }
                 errorMessage = String.format(ErrorRetriever.getErrorMessage(errorKey.getMessage(), clientLocale), args);
             }
             else {

@@ -34,6 +34,8 @@ import com.google.common.collect.Lists;
 
 import javax.annotation.Nullable;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -193,8 +195,15 @@ public final class Failures
 
         if (throwable instanceof PrestoException) {
             PrestoException e = (PrestoException) throwable;
-            List<String> args = Arrays.stream(e.getArgs()).map(o -> o.toString()).collect(Collectors.toList());
-            return new ErrorKeyStruct(e.getErrorKey().name(), args);
+            if (e.getErrorKey() != null) {
+                try {
+                    return new ErrorKeyStruct(e.getErrorKey().name(), ErrorSerDeUtils.convertObjectArrayToBytes(e.getArgs()));
+                }
+                catch (IOException ioe) {
+                    log.error(ioe, "Unable to convert object arguments to list of bytes");
+                    return new ErrorKeyStruct(e.getErrorKey().name(), new ArrayList<>());
+                }
+            }
         }
 
         return null;
