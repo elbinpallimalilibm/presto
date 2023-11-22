@@ -122,8 +122,7 @@ public final class Failures
                     GENERIC_INTERNAL_ERROR.toErrorCode(), remoteHost, UNKNOWN, null);
         }
         seenFailures.add(throwable);
-
-        // Do not need to localise the inner exception
+        
         ExecutionFailureInfo cause = toFailure(throwable.getCause(), seenFailures);
         ErrorCode errorCode = toErrorCode(throwable);
         if (errorCode == null) {
