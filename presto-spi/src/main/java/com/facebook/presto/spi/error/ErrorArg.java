@@ -24,7 +24,6 @@ import java.util.List;
 @ThriftStruct
 public class ErrorArg
 {
-
     private final List<Byte> arg;
 
     @JsonCreator

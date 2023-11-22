@@ -665,8 +665,7 @@ public class QueuedStatementResource
                 try {
                     args = ErrorSerDeUtils.convertBytesToObjectArray(errorKey.getArgs());
                 }
-                catch (IOException | ClassNotFoundException e)
-                {
+                catch (IOException | ClassNotFoundException e) {
                     log.error(e, "Error converting list of bytes to object array");
                     args = new Object[0];
                 }
