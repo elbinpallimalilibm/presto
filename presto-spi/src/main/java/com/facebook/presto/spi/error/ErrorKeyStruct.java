@@ -24,22 +24,22 @@ import java.util.List;
 @ThriftStruct
 public class ErrorKeyStruct
 {
-    private final String message;
+    private final String key;
     private final List<List<Byte>> args;
 
     @JsonCreator
     @ThriftConstructor
-    public ErrorKeyStruct(@JsonProperty("message") String message, @JsonProperty("args") List<List<Byte>> args)
+    public ErrorKeyStruct(@JsonProperty("key") String key, @JsonProperty("args") List<List<Byte>> args)
     {
         this.args = args;
-        this.message = message;
+        this.key = key;
     }
 
     @JsonProperty
     @ThriftField(1)
-    public String getMessage()
+    public String getKey()
     {
-        return message;
+        return key;
     }
 
     @JsonProperty
